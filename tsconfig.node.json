@@ -4,6 +4,7 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noUnusedParameters": false,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": true,
     "lib": [

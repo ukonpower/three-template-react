@@ -1,20 +1,22 @@
 
 import path from 'path';
 
+
 import react from '@vitejs/plugin-react';
+import glslify from 'rollup-plugin-glslify';
 import { defineConfig } from 'vite';
 
 const basePath = ``;
 
 // https://vitejs.dev/config/
 export default defineConfig( {
-	root: 'src',
+	root: 'src/pages',
 	server: {
 		port: 3000,
 		host: "0.0.0.0",
 	},
 	build: {
-		outDir: '../dist/',
+		outDir: '../../dist/',
 	},
 	resolve: {
 		alias: {
@@ -23,6 +25,16 @@ export default defineConfig( {
 	},
 	plugins: [
 		react(),
+		{
+			...glslify( {
+				basedir: './src/glsl/',
+				transform: [
+					[ 'glslify-hex' ],
+					[ 'glslify-import' ]
+				],
+			} ),
+			enforce: 'pre'
+		}
 	],
 	define: {
 		BASE_PATH: `"${basePath}"`
