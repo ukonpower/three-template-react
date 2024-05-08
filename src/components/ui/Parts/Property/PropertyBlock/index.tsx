@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
 
-import { ArrowIcon } from "../../icon/ArrowIcon";
 
 import style from './index.module.scss';
+
+import { IconArrow } from "~/components/ui/Icon/IconArrow";
 
 type BlockProps = {
 	label: React.ReactNode;
@@ -30,7 +31,7 @@ export const PropertyBlock = ( props: BlockProps ) => {
 
 	return <div className={style.block} data-bg={props.bg !== undefined} data-nomargin={props.noMargin} data-no_indent={props.noIndent} style={{ backgroundColor: bgCol }}>
 		<div className={style.head} onClick={onClick} data-accordion={props.accordion} data-open={open}>
-			{props.accordion && <div className={style.head_icon}><ArrowIcon open={open}/></div> }
+			{props.accordion && <div className={style.head_icon}><IconArrow open={open}/></div> }
 			{props.label && <span className={style.head_text}>{props.label}</span>}
 		</div>
 		{ open && <div className={style.content} data-open={open} data-no_indent={props.noIndent}>

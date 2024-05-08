@@ -1,7 +1,8 @@
 
-import { CheckIcon } from '../../icon/Check';
 
 import style from './index.module.scss';
+
+import { IconCheck } from '~/components/ui/Icon/IconCheck';
 
 type InputBooleanProps = {
 	checked?: boolean
@@ -28,7 +29,7 @@ export const InputBoolean = ( { onChange, ...props }: InputBooleanProps ) => {
 				}}
 			/>
 			<div className={style.check} data-read_only={props.readOnly}>
-				{props.checked && <CheckIcon />}
+				{props.checked && <IconCheck />}
 			</div>
 		</label>
 	</div>;

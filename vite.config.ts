@@ -27,6 +27,7 @@ export default defineConfig( {
 		react(),
 		{
 			...glslify( {
+				//@ts-expect-error ummm
 				basedir: './src/glsl/',
 				transform: [
 					[ 'glslify-hex' ],

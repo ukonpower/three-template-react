@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
 import { VideoTextureLoader } from './VideoTextureLoader';
 
 export declare interface AssetManagerTexture {
@@ -18,7 +19,7 @@ export declare interface AssetManagerAssetData {
 export declare interface AssetManagerParams {
 	assets: AssetManagerAssetData[];
 }
-export class AssetManager extends THREE.EventDispatcher {
+export class AssetManager extends THREE.EventDispatcher<any> {
 
 	private textures: {[key:string]: AssetManagerTexture };
 	private gltfs: {[key:string]: GLTF };

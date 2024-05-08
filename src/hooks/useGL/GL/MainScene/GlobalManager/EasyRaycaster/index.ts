@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import * as ORE from 'ore-three';
 
-export class EasyRaycaster extends THREE.EventDispatcher {
+export class EasyRaycaster extends THREE.EventDispatcher<any> {
 
 	private raycaster: THREE.Raycaster;
 	public touchableObjects: THREE.Object3D[];

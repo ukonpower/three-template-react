@@ -1,7 +1,7 @@
-import * as THREE from 'three';
 import * as ORE from 'ore-three';
+import * as THREE from 'three';
 
-export class VideoTextureLoader extends THREE.EventDispatcher {
+export class VideoTextureLoader extends THREE.EventDispatcher<any> {
 
 	private url: string;
 	private subImgURL?: string;
