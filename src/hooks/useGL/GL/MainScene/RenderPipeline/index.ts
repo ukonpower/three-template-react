@@ -9,11 +9,6 @@ import dofCoc from './shaders/dofCoc.fs';
 import dofComposite from './shaders/dofComposite.fs';
 import fxaaFrag from './shaders/fxaa.fs';
 
-export type PPParam = {
-	bloomBrightness?: number,
-	vignet?: number,
-}
-
 export class RenderPipeline {
 
 	private renderer: THREE.WebGLRenderer;
@@ -45,7 +40,7 @@ export class RenderPipeline {
 		// rt
 
 		this.depthTexture = new THREE.DepthTexture( 1, 1 );
-		this.rt1 = new THREE.WebGLRenderTarget( 1, 1, { depthTexture: this.depthTexture } );
+		this.rt1 = new THREE.WebGLRenderTarget( 1, 1, { type: THREE.FloatType, depthTexture: this.depthTexture } );
 
 		// uniforms
 
@@ -116,7 +111,7 @@ export class RenderPipeline {
 			fragmentShader: bloomBrightFrag,
 			uniforms: ORE.UniformsLib.mergeUniforms( this.commonUniforms, {
 				threshold: {
-					value: 0.5,
+					value: 1.0,
 				},
 			} ),
 			passThrough: true,
@@ -204,11 +199,11 @@ export class RenderPipeline {
 		this.postProcess = new ORE.PostProcess( {
 			renderer: this.renderer,
 			passes: [
-				// this.dofCoc,
-				// this.dofBokeh,
-				// this.dofComposite,
-				this.fxaa,
 				this.bloomBright,
+				this.dofCoc,
+				this.dofBokeh,
+				this.dofComposite,
+				this.fxaa,
 				...this.bloomBlur,
 				this.composite,
 			] } );

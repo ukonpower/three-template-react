@@ -24,15 +24,6 @@ export class World extends THREE.Object3D {
 			Light
 		-------------------------------*/
 
-		const light = new THREE.SpotLight();
-		light.lookAt( 0, 0, 0 );
-		light.shadow.bias = - 0.001;
-		light.castShadow = true;
-		light.position.set( 1, 10, 1 );
-		light.angle = Math.PI / 3;
-		light.penumbra = 1;
-		this.add( light );
-
 		this.box = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), new THREE.MeshNormalMaterial() );
 		this.add( this.box );
 
