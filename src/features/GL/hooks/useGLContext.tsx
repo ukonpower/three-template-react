@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { Engine } from '../core';
+import { GLCore } from '../services/GLCore';
+
 
 /**
  * GLインスタンスを管理するコンテキスト用フック
@@ -8,12 +9,12 @@ import { Engine } from '../core';
  */
 export const useGLContext = () => {
 
-	const [ gl, setGL ] = useState<Engine>();
+	const [ gl, setGL ] = useState<GLCore>();
 
 	useEffect( () => {
 
 		// GLインスタンスを作成
-		const gl = new Engine();
+		const gl = new GLCore();
 		setGL( gl );
 
 		return () => {
