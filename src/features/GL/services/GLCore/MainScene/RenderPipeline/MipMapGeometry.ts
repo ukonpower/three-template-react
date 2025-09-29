@@ -1,5 +1,5 @@
-import * as THREE from 'three';
 import * as ORE from 'ore-three';
+import * as THREE from 'three';
 
 export class MipmapGeometry extends THREE.BufferGeometry {
 

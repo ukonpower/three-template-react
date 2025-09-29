@@ -1,37 +1,10 @@
 import * as ORE from 'ore-three';
 import * as THREE from 'three';
 
+import { ResizeEvent, UpdateEvent } from '../types';
+
 import { RenderPipeline } from './RenderPipeline';
 import { World } from './World';
-
-// 独自型定義（ORE.LayerInfoの代替）
-interface LayerSize {
-	canvasAspectRatio: number;
-	windowSize: THREE.Vector2;
-	windowAspectRatio: number;
-	canvasSize: THREE.Vector2;
-	canvasPixelSize: THREE.Vector2;
-	pixelRatio: number;
-	portraitWeight: number;
-	wideWeight: number;
-}
-
-interface AspectSetting {
-	mainAspect: number;
-	portraitAspect: number;
-	wideAspect: number;
-}
-
-interface LayerInfo {
-	name: string;
-	size: LayerSize;
-	aspectSetting: AspectSetting;
-	canvas: HTMLCanvasElement;
-	width: number;
-	height: number;
-	aspectRatio: number;
-	pixelRatio: number;
-}
 
 interface TouchEventArgs {
 	x: number;
@@ -46,8 +19,6 @@ export class MainScene {
 	public scene: THREE.Scene;
 	public camera: THREE.PerspectiveCamera;
 
-	// レイヤー情報
-	public info: LayerInfo;
 
 	// Uniformsとマネージャー
 	public commonUniforms: ORE.Uniforms;
@@ -71,13 +42,10 @@ export class MainScene {
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
 
-		// レイヤー情報の初期化
-		this.info = this.createLayerInfo();
-
 		// 共通uniformsの初期化
 		this.commonUniforms = ORE.UniformsLib.mergeUniforms( {}, {
 			time: { value: 0 },
-			resolution: { value: new THREE.Vector2( this.info.width, this.info.height ) },
+			resolution: { value: new THREE.Vector2( window.innerWidth, window.innerHeight ) },
 		} );
 
 		/*-------------------------------
@@ -92,41 +60,6 @@ export class MainScene {
 
 	}
 
-	/**
-	 * LayerInfo構造体を作成
-	 */
-	private createLayerInfo(): LayerInfo {
-
-		const width = window.innerWidth;
-		const height = window.innerHeight;
-		const aspectRatio = width / height;
-		const pixelRatio = window.devicePixelRatio;
-
-		return {
-			name: 'MainScene',
-			width,
-			height,
-			aspectRatio,
-			pixelRatio,
-			canvas: this.renderer.domElement,
-			size: {
-				canvasAspectRatio: aspectRatio,
-				windowSize: new THREE.Vector2( width, height ),
-				windowAspectRatio: aspectRatio,
-				canvasSize: new THREE.Vector2( width, height ),
-				canvasPixelSize: new THREE.Vector2( width * pixelRatio, height * pixelRatio ),
-				pixelRatio,
-				portraitWeight: aspectRatio < 1 ? 1 : 0,
-				wideWeight: aspectRatio > 1 ? 1 : 0,
-			},
-			aspectSetting: {
-				mainAspect: 16 / 9,
-				portraitAspect: 9 / 16,
-				wideAspect: 21 / 9,
-			}
-		};
-
-	}
 
 	onUnbind() {
 
@@ -159,7 +92,13 @@ export class MainScene {
 
 		if ( this.world ) {
 
-			this.world.update( deltaTime );
+			// UpdateEventを作成してworldに渡す
+			const updateEvent: UpdateEvent = {
+				deltaTime,
+				time: this.commonUniforms.time.value
+			};
+
+			this.world.update( updateEvent );
 
 		}
 
@@ -169,27 +108,40 @@ export class MainScene {
 
 	public onResize() {
 
-		// レイヤー情報の更新
-		this.info = this.createLayerInfo();
+		// サイズ情報を計算
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		const aspectRatio = width / height;
+		const pixelRatio = window.devicePixelRatio;
 
 		// レンダラーのサイズ更新
-		this.renderer.setSize( this.info.width, this.info.height );
-		this.renderer.setPixelRatio( this.info.pixelRatio );
+		this.renderer.setSize( width, height );
+		this.renderer.setPixelRatio( pixelRatio );
 
 		// カメラのアスペクト比更新
-		this.camera.aspect = this.info.aspectRatio;
+		this.camera.aspect = aspectRatio;
 		this.camera.updateProjectionMatrix();
 
 		// 解像度uniformの更新
-		this.commonUniforms.resolution.value.set( this.info.width, this.info.height );
+		this.commonUniforms.resolution.value.set( width, height );
+
+		// ResizeEventを作成
+		const resizeEvent: ResizeEvent = {
+			width,
+			height,
+			aspectRatio,
+			pixelRatio,
+			canvasPixelSize: new THREE.Vector2( width * pixelRatio, height * pixelRatio ),
+			portraitWeight: aspectRatio < 1 ? 1 : 0
+		};
 
 		if ( this.world ) {
 
-			this.world.resize( this.info );
+			this.world.resize( resizeEvent );
 
 		}
 
-		this.renderPipeline.resize( this.info );
+		this.renderPipeline.resize( resizeEvent );
 
 	}
 

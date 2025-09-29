@@ -2,12 +2,14 @@ import * as ORE from 'ore-three';
 import * as THREE from 'three';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import { ResizeEvent, UpdateEvent } from '../../types';
+
 export class World extends THREE.Object3D {
 
-	private gltf?: GLTF;
+	private _gltf?: GLTF;
 
 	private camera: THREE.Camera;
-	private commonUniforms: ORE.Uniforms;
+	private _commonUniforms: ORE.Uniforms;
 
 	private box: THREE.Mesh;
 
@@ -17,7 +19,7 @@ export class World extends THREE.Object3D {
 
 		this.camera = camera;
 
-		this.commonUniforms = ORE.UniformsLib.mergeUniforms( parentUniforms, {
+		this._commonUniforms = ORE.UniformsLib.mergeUniforms( parentUniforms, {
 		} );
 
 		/*-------------------------------
@@ -33,21 +35,21 @@ export class World extends THREE.Object3D {
 
 	public setGltf( gltf: GLTF ) {
 
-		this.gltf = gltf;
+		this._gltf = gltf;
 
-		// this.add( this.gltf.scene );
-
-	}
-
-	public update( deltaTime: number ) {
-
-		this.box.rotateY( deltaTime );
-		this.box.rotateX( deltaTime * 0.1 );
-
+		// this.add( this._gltf.scene );
 
 	}
 
-	public resize( info: ORE.LayerInfo ) {
+	public update( event: UpdateEvent ) {
+
+		this.box.rotateY( event.deltaTime );
+		this.box.rotateX( event.deltaTime * 0.1 );
+
+
+	}
+
+	public resize( _event: ResizeEvent ) {
 	}
 
 	public dispose() {

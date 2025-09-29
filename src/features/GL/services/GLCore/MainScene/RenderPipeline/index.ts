@@ -1,6 +1,8 @@
 import * as ORE from 'ore-three';
 import * as THREE from 'three';
 
+import { ResizeEvent } from '../../types';
+
 import bloomBlurFrag from './shaders/bloomBlur.fs';
 import bloomBrightFrag from './shaders/bloomBright.fs';
 import compositeFrag from './shaders/composite.fs';
@@ -205,9 +207,9 @@ export class RenderPipeline {
 
 	}
 
-	public resize( info: ORE.LayerInfo ) {
+	public resize( event: ResizeEvent ) {
 
-		const resolution = info.size.canvasPixelSize;
+		const resolution = event.canvasPixelSize;
 
 		this.postProcess.resize( resolution );
 

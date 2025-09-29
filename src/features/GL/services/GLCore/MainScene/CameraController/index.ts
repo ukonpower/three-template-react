@@ -1,5 +1,7 @@
-import * as THREE from 'three';
 import * as ORE from 'ore-three';
+import * as THREE from 'three';
+
+import { ResizeEvent } from '../../types';
 
 export class CameraController {
 
@@ -58,9 +60,9 @@ export class CameraController {
 
 	}
 
-	public resize( layerInfo: ORE.LayerInfo ) {
+	public resize( event: ResizeEvent ) {
 
-		this.camera.fov = this.baseCamera.fov + layerInfo.size.portraitWeight * 20.0;
+		this.camera.fov = this.baseCamera.fov + event.portraitWeight * 20.0;
 		this.camera.updateProjectionMatrix();
 
 	}
