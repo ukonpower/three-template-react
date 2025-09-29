@@ -4,9 +4,6 @@ import * as THREE from 'three';
 import bloomBlurFrag from './shaders/bloomBlur.fs';
 import bloomBrightFrag from './shaders/bloomBright.fs';
 import compositeFrag from './shaders/composite.fs';
-import dofBokeh from './shaders/dofBokeh.fs';
-import dofCoc from './shaders/dofCoc.fs';
-import dofComposite from './shaders/dofComposite.fs';
 import fxaaFrag from './shaders/fxaa.fs';
 
 export class RenderPipeline {
@@ -26,10 +23,6 @@ export class RenderPipeline {
 	private bloomBright: ORE.PostProcessPass;
 	private bloomBlur: ORE.PostProcessPass[];
 
-	private dofParams: THREE.Vector4;
-	public dofCoc: ORE.PostProcessPass;
-	public dofBokeh: ORE.PostProcessPass;
-	public dofComposite: ORE.PostProcessPass;
 
 	private composite: ORE.PostProcessPass;
 
@@ -47,52 +40,6 @@ export class RenderPipeline {
 		this.commonUniforms = ORE.UniformsLib.mergeUniforms( parentUniforms, {
 		} );
 
-		// dof
-
-		this.dofParams = new THREE.Vector4();
-
-		this.dofCoc = new ORE.PostProcessPass( {
-			glslVersion: THREE.GLSL3,
-			fragmentShader: dofCoc,
-			uniforms: ORE.UniformsLib.mergeUniforms( this.commonUniforms, {
-				uParams: {
-					value: this.dofParams,
-				},
-				uDepthTex: {
-					value: this.depthTexture
-				}
-			} ),
-			renderTarget: new THREE.WebGLRenderTarget( 1, 1, { type: THREE.HalfFloatType, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } ),
-			passThrough: true,
-			resolutionRatio: 0.5
-		} );
-
-		this.dofBokeh = new ORE.PostProcessPass( {
-			glslVersion: THREE.GLSL3,
-			fragmentShader: dofBokeh,
-			uniforms: ORE.UniformsLib.mergeUniforms( this.commonUniforms, {
-				uParams: {
-					value: this.dofParams,
-				},
-				uCocTex: {
-					value: this.dofCoc.renderTarget!.texture
-				},
-			} ),
-			renderTarget: new THREE.WebGLRenderTarget( 1, 1, { type: THREE.HalfFloatType, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } ),
-			passThrough: true,
-			resolutionRatio: 0.5
-		} );
-
-		this.dofComposite = new ORE.PostProcessPass( {
-			glslVersion: THREE.GLSL3,
-			fragmentShader: dofComposite,
-			uniforms: ORE.UniformsLib.mergeUniforms( {
-				uBokehTex: {
-					value: this.dofBokeh.renderTarget!.texture
-				},
-			} ),
-			renderTarget: new THREE.WebGLRenderTarget( 1, 1, { type: THREE.HalfFloatType, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } ),
-		} );
 
 		// fxaa
 
@@ -200,9 +147,6 @@ export class RenderPipeline {
 			renderer: this.renderer,
 			passes: [
 				this.bloomBright,
-				this.dofCoc,
-				this.dofBokeh,
-				this.dofComposite,
 				this.fxaa,
 				...this.bloomBlur,
 				this.composite,
@@ -246,19 +190,6 @@ export class RenderPipeline {
 	}
 
 	public render( scene: THREE.Scene, camera: THREE.Camera ) {
-
-		// dof
-
-		const fov = ( camera as THREE.PerspectiveCamera ).isPerspectiveCamera ? ( camera as THREE.PerspectiveCamera ).fov : 50.0;
-
-		const focusDistance = camera.getWorldPosition( new THREE.Vector3() ).length();
-		const kFilmHeight = 0.006;
-		const flocalLength = kFilmHeight / Math.tan( 0.5 * ( fov * THREE.MathUtils.DEG2RAD ) );
-		const maxCoc = 1 / this.dofBokeh.renderTarget!.height * 6.0;
-		const rcpMaxCoC = 1.0 / maxCoc;
-		const coeff = flocalLength * flocalLength / ( 0.3 * ( focusDistance - flocalLength ) * kFilmHeight * 2 );
-
-		this.dofParams.set( focusDistance, maxCoc, rcpMaxCoC, coeff );
 
 		// render
 
