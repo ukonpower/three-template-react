@@ -1,17 +1,4 @@
 import { MainScene } from './MainScene';
-import { GlobalManager } from './MainScene/GlobalManager';
-import { AssetManager } from './MainScene/GlobalManager/AssetManager';
-
-declare global {
-	interface Window {
-		glCanvas: {
-			gManager: GlobalManager;
-			assetManager: AssetManager;
-			isSP: boolean;
-			mainScene: MainScene;
-		}
-	}
-}
 
 export class GLCore {
 
@@ -28,7 +15,6 @@ export class GLCore {
 
 	constructor() {
 
-		window.glCanvas = {} as any;
 
 		/*------------------------
 			init Scene

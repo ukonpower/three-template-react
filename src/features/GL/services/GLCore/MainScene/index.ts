@@ -1,8 +1,6 @@
-import * as THREE from 'three';
 import * as ORE from 'ore-three';
-import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as THREE from 'three';
 
-import { GlobalManager } from './GlobalManager';
 import { RenderPipeline } from './RenderPipeline';
 import { World } from './World';
 
@@ -47,71 +45,50 @@ export class MainScene {
 	public renderer: THREE.WebGLRenderer;
 	public scene: THREE.Scene;
 	public camera: THREE.PerspectiveCamera;
-	
+
 	// レイヤー情報
 	public info: LayerInfo;
-	
+
 	// Uniformsとマネージャー
 	public commonUniforms: ORE.Uniforms;
 
-	private gManager: GlobalManager;
 	private renderPipeline: RenderPipeline;
 
-	private gltf?: GLTF;
 	private world?: World;
 
 	constructor() {
 
 		// Three.jsの基本設定
-		this.renderer = new THREE.WebGLRenderer({
+		this.renderer = new THREE.WebGLRenderer( {
 			antialias: true,
 			alpha: false,
-		});
-		this.renderer.setPixelRatio(window.devicePixelRatio);
+		} );
+		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		// シーンとカメラの初期化
 		this.scene = new THREE.Scene();
-		this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+		this.camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
 
 		// レイヤー情報の初期化
 		this.info = this.createLayerInfo();
 
 		// 共通uniformsの初期化
-		this.commonUniforms = ORE.UniformsLib.mergeUniforms({}, {
+		this.commonUniforms = ORE.UniformsLib.mergeUniforms( {}, {
 			time: { value: 0 },
-			resolution: { value: new THREE.Vector2(this.info.width, this.info.height) },
-		});
-
-		/*-------------------------------
-			Gmanager
-		-------------------------------*/
-
-		const gltfPath = '/scene.glb';
-
-		this.gManager = new GlobalManager();
-
-		this.gManager.assetManager.load({
-			assets: [
-				{ name: 'scene', path: gltfPath, type: 'gltf' }
-			]
-		});
-
-		this.gManager.assetManager.addEventListener('loadMustAssets', () => {
-
-			this.gltf = this.gManager.assetManager.getGltf("scene");
-
-			this.initScene();
-			this.onResize();
-
-		});
+			resolution: { value: new THREE.Vector2( this.info.width, this.info.height ) },
+		} );
 
 		/*-------------------------------
 			RenderPipeline
 		-------------------------------*/
 
-		this.renderPipeline = new RenderPipeline(this.renderer, this.commonUniforms);
+		this.renderPipeline = new RenderPipeline( this.renderer, this.commonUniforms );
+
+		// シーンの初期化
+		this.initScene();
+		this.onResize();
 
 	}
 
@@ -119,6 +96,7 @@ export class MainScene {
 	 * LayerInfo構造体を作成
 	 */
 	private createLayerInfo(): LayerInfo {
+
 		const width = window.innerWidth;
 		const height = window.innerHeight;
 		const aspectRatio = width / height;
@@ -133,10 +111,10 @@ export class MainScene {
 			canvas: this.renderer.domElement,
 			size: {
 				canvasAspectRatio: aspectRatio,
-				windowSize: new THREE.Vector2(width, height),
+				windowSize: new THREE.Vector2( width, height ),
 				windowAspectRatio: aspectRatio,
-				canvasSize: new THREE.Vector2(width, height),
-				canvasPixelSize: new THREE.Vector2(width * pixelRatio, height * pixelRatio),
+				canvasSize: new THREE.Vector2( width, height ),
+				canvasPixelSize: new THREE.Vector2( width * pixelRatio, height * pixelRatio ),
 				pixelRatio,
 				portraitWeight: aspectRatio < 1 ? 1 : 0,
 				wideWeight: aspectRatio > 1 ? 1 : 0,
@@ -147,11 +125,12 @@ export class MainScene {
 				wideAspect: 21 / 9,
 			}
 		};
+
 	}
 
 	onUnbind() {
 
-		if (this.world) {
+		if ( this.world ) {
 
 			this.world.dispose();
 
@@ -165,36 +144,26 @@ export class MainScene {
 			World
 		-------------------------------*/
 
-		this.world = new World(this.camera, this.commonUniforms);
+		this.world = new World( this.camera, this.commonUniforms );
 
-		if (this.gltf) {
-
-			this.world.setGltf(this.gltf);
-
-		}
-
-		this.scene.add(this.world);
+		this.scene.add( this.world );
 
 	}
 
-	public animate(deltaTime: number) {
+	public animate( deltaTime: number ) {
 
 		// 共通uniformsの更新
 		this.commonUniforms.time.value += deltaTime;
 
-		if (this.gManager) {
+		// GlobalManagerの代替処理が必要な場合はここに追加
 
-			this.gManager.update(deltaTime);
+		if ( this.world ) {
 
-		}
-
-		if (this.world) {
-
-			this.world.update(deltaTime);
+			this.world.update( deltaTime );
 
 		}
 
-		this.renderPipeline.render(this.scene, this.camera);
+		this.renderPipeline.render( this.scene, this.camera );
 
 	}
 
@@ -204,39 +173,39 @@ export class MainScene {
 		this.info = this.createLayerInfo();
 
 		// レンダラーのサイズ更新
-		this.renderer.setSize(this.info.width, this.info.height);
-		this.renderer.setPixelRatio(this.info.pixelRatio);
+		this.renderer.setSize( this.info.width, this.info.height );
+		this.renderer.setPixelRatio( this.info.pixelRatio );
 
 		// カメラのアスペクト比更新
 		this.camera.aspect = this.info.aspectRatio;
 		this.camera.updateProjectionMatrix();
 
 		// 解像度uniformの更新
-		this.commonUniforms.resolution.value.set(this.info.width, this.info.height);
+		this.commonUniforms.resolution.value.set( this.info.width, this.info.height );
 
-		if (this.world) {
+		if ( this.world ) {
 
-			this.world.resize(this.info);
+			this.world.resize( this.info );
 
 		}
 
-		this.renderPipeline.resize(this.info);
+		this.renderPipeline.resize( this.info );
 
 	}
 
-	public onHover(args: TouchEventArgs) {
+	public onHover( _args: TouchEventArgs ) {
 	}
 
-	public onTouchStart(args: TouchEventArgs) {
+	public onTouchStart( _args: TouchEventArgs ) {
 	}
 
-	public onTouchMove(args: TouchEventArgs) {
+	public onTouchMove( _args: TouchEventArgs ) {
 	}
 
-	public onTouchEnd(args: TouchEventArgs) {
+	public onTouchEnd( _args: TouchEventArgs ) {
 	}
 
-	public onWheelOptimized(event: WheelEvent) {
+	public onWheelOptimized( _event: WheelEvent ) {
 	}
 
 }
