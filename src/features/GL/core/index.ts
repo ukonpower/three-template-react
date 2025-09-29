@@ -15,7 +15,7 @@ declare global {
 	}
 }
 
-export class GL {
+export class Engine {
 
 	public canvas: HTMLCanvasElement;
 

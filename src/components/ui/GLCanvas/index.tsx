@@ -1,12 +1,12 @@
-import { useContext, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 import style from './index.module.scss';
 
-import { GLContext } from "~/hooks/useGL";
+import { useGL } from "~/features/GL/hooks/useGL";
 
 export const GLCanvas = () => {
 
-	const { gl } = useContext( GLContext );
+	const gl = useGL();
 	const wrapperElmRef = useRef<HTMLDivElement | null>( null );
 
 	useEffect( () => {
